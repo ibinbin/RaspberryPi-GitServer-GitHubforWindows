@@ -1,175 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Raspberry Pi Git Server With Github for Windows Client</title>
     <link href="css/bootstrap.css" rel="stylesheet">
-	<link href="css/bootstrap-theme.css" rel="stylesheet">
-		</head>
-  <body>
-  <div class="container">
-  <img src="img/raspberry.png">
-  <h1>Private GIT Server On Raspberry Pi and GIThub For Windows</h1>
-  I recently setup my Raspberry Pi as a private Git server for all my Git repositories. It took a little time to get everything working correctly, but it is up and running.
-As awesome as GitHub is, sometimes in more secure environments, it's just not possible to utilize GitHub for source code management.
-After becoming more accustomed to using GitHub for Windows (GHfW) over the past year or so, I wanted to continue using their Windows app, but with my own locally hosted Git remote running on Raspberry Pi.
-It's fairly well-known that GitHub's Windows app will work with non-GitHub remotes, but information on exactly how to do this with your own, locally-hosted Git remote is a bit scarce.
-Most information assumes you're using another publicly-available Git service, where HTTPS is commonly used and SSH and key management is handled behind the scenes.
-But what if you want to host your own Git server on your local network?  Here is a tutorial just for you!
-Here is what you need to do in order to setup your own private Git server for all your repositories.
-  <dl>
-    <dt>Server Requierement:</dt>
-	    <dd> Raspberry Pi (any model with Ethernet or wifi connectivity).</dd>
-		    <dd>   4Gb SDcard.</dd>
-			    <dd> Fresh Raspbian install.</dd>
-  <dt>Client Requierement:</dt>
-    <dd>Windows PC</dd>
-  <dd>PuTTY and PuTTYGen installed</dd>
-    <dd>GitHub for Windows installed</dd>
-</dl>
+    <link href="css/bootstrap-theme.css" rel="stylesheet">
+</head>
 
-<h3>Update, Upgrade and Reboot</h3>
-<code>sudo apt-get update</code>, <code>sudo apt-get upgrade</code>, <code>sudo shutdown -r now</code>
+<body>
+    <div class="container">
+        <img src="img/raspberry.png">
+        <h1>Private GIT Server On Raspberry Pi and GIThub For Windows</h1> I recently setup my Raspberry Pi as a private Git server for all my Git repositories. It took a little time to get everything working correctly, but it is up and running. As awesome as GitHub is, sometimes in more secure environments, it's just not possible to utilize GitHub for source code management. After becoming more accustomed to using GitHub for Windows (GHfW) over the past year or so, I wanted to continue using their Windows app, but with my own locally hosted Git remote running on Raspberry Pi. It's fairly well-known that GitHub's Windows app will work with non-GitHub remotes, but information on exactly how to do this with your own, locally-hosted Git remote is a bit scarce. Most information assumes you're using another publicly-available Git service, where HTTPS is commonly used and SSH and key management is handled behind the scenes. But what if you want to host your own Git server on your local network? Here is a tutorial just for you! Here is what you need to do in order to setup your own private Git server for all your repositories.
+        <dl>
+            <dt>Server Requierement:</dt>
+            <dd>Raspberry Pi (any model with Ethernet or wifi connectivity).</dd>
+            <dd>SDcard (4Gb or bigger).</dd>
+            <dd>Fresh Raspbian install.</dd>
+            <dt>Client Requierement:</dt>
+            <dd>Windows PC</dd>
+            <dd>PuTTY and PuTTYGen installed</dd>
+            <dd>GitHub for Windows installed</dd>
+        </dl>
 
-<h2>Raspberry Pi Softwares Installation</h2>
-<h3>Install SSH</h3>
-SSH Should be installed along with Raspbian, make sure it's running with <code>sudo service ssh status</code>, configure it with <code>sudo raspi-config</code>.
-If you don't already have SSH installed, do so with the following command:
-<code>sudo apt-get install ssh</code>
-You can then start it with this command:
-<code>sudo /etc/init.d/ssh start</code>
-You now have SSH running, to make it start at boot run this command once:
-<code>sudo update-rc.d ssh defaults</code>
-After rebooting your Pi, SSH should now startup automatically. To see if you can connect to your Pi via SSH, go on your Windows machine and try connecting using Putty
-Enter the IP adress of your Pi in the Host Name textbox. To find your IP address run this command:
-/sbin/ifconfig
-Look for inet addr: and your IP is right after that.
+        <h3>Update, Upgrade and Reboot</h3>
+        <code>sudo apt-get update</code>, <code>sudo apt-get upgrade</code>, <code>sudo shutdown -r now</code>
 
-<h3>Install Git</h3>
+        <h2>Raspberry Pi Softwares Installation</h2>
+        <h3>Install SSH (Optional)</h3> SSH Should be installed along with Raspbian, make sure it's running with <code>sudo service ssh status</code>, configure it with <code>sudo raspi-config</code>. If you don't already have SSH installed, do so with the following command:
+        <code>sudo apt-get install ssh</code> You can then start it with this command:
+        <code>sudo /etc/init.d/ssh start</code> You now have SSH running, to make it start at boot run this command once:
+        <code>sudo update-rc.d ssh defaults</code> After rebooting your Pi, SSH should now startup automatically. To see if you can connect to your Pi via SSH, go on your Windows machine and try connecting using Putty Enter the IP adress of your Pi in the Host Name textbox. To find your IP address run this command: /sbin/ifconfig Look for inet addr: and your IP is right after that.
 
-First you have to get Git on your pi.
-<code>sudo apt-get install wget git-core</code>
-This will install the Git server and the necessary client software.
+        <h3>Install Git</h3> First you have to get Git on your pi.
+        <code>sudo apt-get install wget git-core</code> This will install the Git server and the necessary client software.
 
-<h2>GitHub For Windows Setup</h2>
+        <h2>GitHub For Windows Setup</h2>
 
-<h3>Create our SSH Keys</h3>
-On your Windows machine, open PuttyGen. Set the key parameters to SSH-2 RSA and bits to 2048, then hit Generate to create a key.
-Select Save Private Key, name this file id_rsa.ppk and save it to your desktop
-The .PPK extension is special to PuTTY and its related software. Choose this file as your private key when you are using PuTTY to SSH into systems.
-Select Conversions -> Export OpenSSH Key. Name this file id_rsa and save it to your desktop.
-Select ALL text in the public key box at the top of the PuTTYGen window. Copy this text, then save it into a new file on your desktop called id_rsa.pub. Don't forget to insert a blank line on the end for good measure.
+        <h3>Create our SSH Keys</h3> On your Windows machine, open PuttyGen. Set the key parameters to SSH-2 RSA and bits to 2048, then hit Generate to create a key. Select Save Private Key, name this file id_rsa.ppk and save it to your desktop The .PPK extension is special to PuTTY and its related software. Choose this file as your private key when you are using PuTTY to SSH into systems. Select Conversions -> Export OpenSSH Key. Name this file id_rsa and save it to your desktop. Select ALL text in the public key box at the top of the PuTTYGen window. Copy this text, then save it into a new file on your desktop called id_rsa.pub. Don't forget to insert a blank line on the end for good measure. Note: This is your public key in the proper OpenSSH format. This is the file you'll provide system administrators when you want to access systems via SSH using public key authentication. Don't use the Save Public Key button in PuTTYGen--using that function will save your public key in the RFC 4716 format, which changes the format and adds newline characters in your encoded key, and thus won't work with most SSH servers. After completing the above steps, you should have three new files:
+        <ul>
+            <li>id_rsa - Your private key in OpenSSH format</li>
+            <li>id_rsa.pub - Your public key in OpenSSH format</li>
+            <li>id_rsa.ppk - Your private key in PuTTY format (Key allow connection without having to enter password)</li>
+        </ul>
 
-Note: This is your public key in the proper OpenSSH format.  This is the file you'll provide system administrators when you want to access systems via SSH using public key authentication.  Don't use the Save Public Key button in PuTTYGen--using that function will save your public key in the RFC 4716 format, which changes the format and adds newline characters in your encoded key, and thus won't work with most SSH servers.
-After completing the above steps, you should have three new files:
-<ul>
-  <li>id_rsa - Your private key in OpenSSH format</li>
-  <li>id_rsa.pub - Your public key in OpenSSH format</li>
-  <li>id_rsa.ppk - Your private key in PuTTY format (Key allow connection without having to enter password)</li>
-</ul>
+        These files typically will reside in a subdirectory in your home directory. We'll move these to the proper location later.
 
-These files typically will reside in a subdirectory in your home directory. We'll move these to the proper location later.
+        <h3>Configure GitHub for Windows to use our SSH Keys</h3> On first launch, GitHub for Windows (GHfW) will generate a public/private key pair for you and save these to your home directory under .ssh (ie C:\Users\Joe\.ssh). The two files created for you are:
+        <ul>
+            <li>github_rsa</li>
+            <li>github_rsa.pub</li>
+        </ul>
 
-<h3>Configure GitHub for Windows to use our SSH Keys</h3>
-On first launch, GitHub for Windows (GHfW) will generate a public/private key pair for you and save these to your home directory under .ssh (ie C:\Users\Joe\.ssh). The two files created for you are:
-<ul>
-  <li>github_rsa</li>
-  <li>github_rsa.pub</li>
-</ul>
+        If you have created your keys as described in the previous section, go ahead and move them over to the .ssh directory that GHfW created for you on first run. For the rest of this post, we'll assume you have your own keys stored in the same location as the GHfW-generated keys (appropriately named id_rsa and id_rsa.pub). Along with generating the keys for you, GHfW will also register a new identity for the private key it has created. This is important, as GHfW will only use registered identities to authenticate with a remote. Simply placing your id_rsa file in your .ssh directory isn't enough for Git to utilize it. To register your private key, fire up Git Shell (which comes packaged with GHfW) and run the following command (inserting your private key path where appropriate):
 
-If you have created your keys as described in the previous section, go ahead and move them over to the .ssh directory that GHfW created for you on first run. For the rest of this post, we'll assume you have your own keys stored in the same location as the GHfW-generated keys (appropriately named id_rsa and id_rsa.pub).
+        <code>ssh-add C:\Users\Joe\.ssh\id_rsa</code> To ensure your key was properly registered, run the following command to display a list of all registered identities.
 
-Along with generating the keys for you, GHfW will also register a new identity for the private key it has created. This is important, as GHfW will only use registered identities to authenticate with a remote. Simply placing your id_rsa file in your .ssh directory isn't enough for Git to utilize it.
+        <code>ssh-add -L</code> If done properly, you should see your private key listed, as well as the GHfW-generated key. Now that GHfW is set up, we can set up our Git remote.
 
-To register your private key, fire up Git Shell (which comes packaged with GHfW) and run the following command (inserting your private key path where appropriate):
+        <h2>Raspberry Pi Setup</h2>
 
-<code>ssh-add C:\Users\Joe\.ssh\id_rsa</code>
-To ensure your key was properly registered, run the following command to display a list of all registered identities.
+        <h3>Add a "Git" User and Group</h3> Next you will want to create a 'git' user and a new user group. Note that /home/git is the directory I am using for this example. If you want it somewhere else, replace the "/home/git" part in the command. SSH into the Linux server and run the following commands to create the git user
+        <code>sudo adduser --system --shell /bin/bash --gecos 'git version control by pi' --group --home /home/git git</code> After you have created the user, change the password.
+        <code>passwd git</code> Your 'git' user now has a new password. Try switching users, and you should see the terminal user and host as 'git@gitpi'. You can change users by doing this:
+        <code>su git</code>
 
-<code>ssh-add -L</code>
-If done properly, you should see your private key listed, as well as the GHfW-generated key. Now that GHfW is set up, we can set up our Git remote.
+        <h3>Configure the Raspberry to use our SSH Keys</h3> Make sure you are in the git user context, create a ~/.ssh/authorized_keys file and add our public key
 
-<h2>Raspberry Pi Setup</h2>
+        <code>sudo su git</code>
+        <code>mkdir ~/.ssh</code>
+        <code>cd ~/.ssh</code>
+        <code>vi authorized_keys</code> Then copy/paste the text from our id_rsa.pub file and save (remember to add a new blank line at the end of the file) You can aternatively launch WinSCP, connect with the git user and put a authorized_keys file you created into the .ssh directory. Now validate that the keys are working properly: open PuTTY or your favorite SSH program and try logging in as the git user using your private key.
 
-<h3>Add a "Git" User and Group</h3>
+        <h2>Push Code to your Pi</h2>
 
-Next you will want to create a 'git' user and a new user group. Note that /home/git is the directory I am using for this example. If you want it somewhere else, replace the "/home/git" part in the command. SSH into the Linux server and run the following commands to create the git user
-<code>sudo adduser --system --shell /bin/bash --gecos 'git version control by pi' --group --home /home/git git</code>
-After you have created the user, change the password.
-<code>passwd git</code>
-Your 'git' user now has a new password. Try switching users, and you should see the terminal user and host as 'git@gitpi'. You can change users by doing this:
-<code>su git</code>
+        <h3>Add an Empty Git Repository on the Pi</h3> We will now create an empty Git Repository (where your repositories will be located). First go to where you will store your git repos.
+        <code>cd /home/git</code> Make a directory for your repo, move into it, and initialize an empty repository. Please note that I am the user 'git' while doing this. This user has control over the /home/git directory.
+        <code>mkdir test.git</code>, <code>cd test.git</code>, <code>git --bare init</code>.
 
-<h3>Configure the Raspberry to use our SSH Keys</h3>
-Make sure you are in the git user context, create a ~/.ssh/authorized_keys file and add our public key
+        <h3>Push Code</h3> Finally, we will push code onto our device. First, change directories to where you have previously initialized a git repo via <code>cd</code>. Add a new remote: (*no braces around your IP address)
+        <code>git remote add pi git@[your IP]:/home/git/test.git</code> Now all you have to do is add your code, commit, and push.
+        <code>git add .</code>
+        <code>git commit -am "Initial"</code>
+        <code>git push pi master</code> If you get a message about the "authenticity of host ..." just type "yes" and continue. If you want to test it out, try cloning your repo onto your Windows machine. First change directories to where you would like to clone it (an empty directory), then in git shell, run this:
+        <code>git clone git@[your IP]:/home/git/test.git</code> Your repo test.git is now cloned and you have a "test" folder into your directory. Now, drag and drop the "test" folder into GitHub For Windows. Boom! you should be able to do your first commit and publish it to your Raspberry Pi Git Server!
 
-<code>sudo su git</code>
-<code>mkdir ~/.ssh</code>
-<code>cd ~/.ssh</code>
-<code>vi authorized_keys</code>
-Then copy/paste the text from our id_rsa.pub file and save (remember to add a new blank line at the end of the file)
-You can aternatively launch WinSCP, connect with the git user and put a authorized_keys file you created into the .ssh directory.
+        <h2>Ressources</h2>
 
-Now validate that the keys are working properly: open PuTTY or your favorite SSH program and try logging in as the git user using your private key.
+        <h3>Tips</h3> To grant other users access to the Git remote, simply add their public keys to the git user's authorized_keys file. Add yourself and other users to the "git" user group, then modify the file permissions on the /opt/git directory to grant group members recursive rwx access to the folder (hint: sticky bit is your friend) Edit /etc/passwd and change the git user's default shell to /usr/bin/git-shell. This will lock down the git user to only allow it to perform git-related functions. To create a new repository, simply log into your Git server as the git user and create a new repo.git directory in /opt/git, followed by initializing a bare repository inside the newly-created .git directory. Change Hostname This step isn't necessary, but I do highly recommend it if you are using, or ever plan on using, multiple Raspberry Pi devices. sudo leafpad /etc/hostname Type in the hostname your would like use, and then save the file. My hostname is "gitpi". Next, type the following: sudo leafpad /etc/hosts Replace any instance of "raspberrypi" with the new host name you entered in the previous step. After this, reboot your Raspberry Pi.
 
-<h2>Push Code to your Pi</h2>
+        <h3>Source</h3>
 
-<h3>Add an Empty Git Repository on the Pi</h3>
-We will now create an empty Git Repository (where your repositories will be located).
-First go to where you will store your git repos.
-<code>cd /home/git</code>
-Make a directory for your repo, move into it, and initialize an empty repository.
-Please note that I am the user 'git' while doing this. This user has control over the /home/git directory.
-<code>mkdir test.git</code>, <code>cd test.git</code>, <code>git --bare init</code>.
+        <ul>
+            <li>http://www.sharkwavemedia.com/blog/posts/github-for-windows-with-a-non-github-git-server</li>
+            <li>http://monkeyhacks.com/raspberry-pi-as-private-git-server</li>
+        </ul>
 
-<h3>Push Code</h3>
-
-Finally, we will push code onto our device. First, change directories to where you have previously initialized a git repo (or initialize a new one).
-
-Add a new remote: (*no braces around your IP address)
-<code>git remote add pi git@[your IP]:/home/git/test.git</code>
-Now all you have to do is add your code, commit, and push.
-<code>git add .</code>
-<code>git commit -am "Initial"</code>
-<code>git push pi master</code>
-If you get a message about the "authenticity of host ..." just type "yes" and continue.
-
-If you want to test it out, try cloning your repo onto your Windows machine. First change directories to where you would like to clone it (an empty directory), then in git shell, run this:
-<code>git clone git@[your IP]:/home/git/test.git</code>
-
-Your repo test.git is now cloned and you have a "test" folder into your directory.
-
-Now, drag and drop the "test" folder into GitHub For Windows. Boom! you should be able to do your first commit and publish it to your Raspberry Pi Git Server!
-
-<h2>Ressources</h2>
-
-<h3>Tips</h3>
-
-To grant other users access to the Git remote, simply add their public keys to the git user's authorized_keys file.
-Add yourself and other users to the "git" user group, then modify the file permissions on the /opt/git directory to grant group members recursive rwx access to the folder (hint: sticky bit is your friend)
-Edit /etc/passwd and change the git user's default shell to /usr/bin/git-shell. This will lock down the git user to only allow it to perform git-related functions.
-To create a new repository, simply log into your Git server as the git user and create a new repo.git directory in /opt/git, followed by initializing a bare repository inside the newly-created .git directory.
-
-Change Hostname
-
-This step isn't necessary, but I do highly recommend it if you are using, or ever plan on using, multiple Raspberry Pi devices.
-sudo leafpad /etc/hostname
-Type in the hostname your would like use, and then save the file. My hostname is "gitpi".
-Next, type the following:
-sudo leafpad /etc/hosts
-Replace any instance of "raspberrypi" with the new host name you entered in the previous step. After this, reboot your Raspberry Pi.
-
-<h3>Source</h3>
-
-<ul>
-  <li>http://www.sharkwavemedia.com/blog/posts/github-for-windows-with-a-non-github-git-server</li>
-  <li>http://monkeyhacks.com/raspberry-pi-as-private-git-server</li>
-</ul>
-
-</div>
+    </div>
     <script src="js/jquery-1.11.1.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
-  </body>
+</body>
+
 </html>
